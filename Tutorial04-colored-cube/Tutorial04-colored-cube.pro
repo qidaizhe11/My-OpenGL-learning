@@ -3,5 +3,15 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp
+LIBS += -lGL -lGLU -lGLEW -lglfw
+
+SOURCES += main.cpp \
+    ../common/shader.cpp
+
+HEADERS += \
+    ../common/shader.hpp
+
+OTHER_FILES += \
+    Transform.vert \
+    Color.frag
 
