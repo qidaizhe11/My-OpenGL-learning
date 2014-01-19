@@ -7,7 +7,9 @@
 
 #include "texture.h"
 
-// TODO: Error: FOURCC_DXT1 FOURCC_DX3 FOURCC_DX5, not found.
+#define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
+#define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
+#define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
 
 GLuint loadDDS(const char *imagepath)
 {
@@ -25,7 +27,7 @@ GLuint loadDDS(const char *imagepath)
 
   char file_code[4];
   fread(file_code, 1, 4, fp);
-  if (strncmp(file_code, "DDS", 4) != 0) {
+  if (strncmp(file_code, "DDS ", 4) != 0) {
     fclose(fp);
     return 0;
   }
@@ -40,7 +42,7 @@ GLuint loadDDS(const char *imagepath)
 
   unsigned char* buffer;
   unsigned int buf_size;
-  buf_size = mipmap_count > 1 ? linear_size*2 : linear_size;
+  buf_size = mipmap_count > 1 ? linear_size * 2 : linear_size;
   buffer = (unsigned char*)malloc(buf_size * sizeof(unsigned char));
   fread(buffer, 1, buf_size, fp);
   fclose(fp);

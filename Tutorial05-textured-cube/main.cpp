@@ -165,7 +165,7 @@ int main()
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    gluniform1i(texture_id, 0);
+    glUniform1i(texture_id, 0);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -187,8 +187,10 @@ int main()
   glDeleteBuffers(1, &vertexbuffer);
   glDeleteBuffers(1, &uvbuffer);
   glDeleteProgram(programID);
+  glDeleteTextures(1, &texture_id);
   glDeleteVertexArrays(1, &vertex_array_id);
 
   glfwTerminate();
   return 0;
 }
+
