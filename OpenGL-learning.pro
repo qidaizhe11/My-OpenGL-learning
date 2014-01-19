@@ -8,4 +8,5 @@ SUBDIRS += \
 #    HelloTriangle \
 #    framework \
 #    glutil \
-    Tutorial04-colored-cube
+    Tutorial04-colored-cube \
+    Tutorial05-textured-cube
