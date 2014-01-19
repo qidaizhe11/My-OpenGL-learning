@@ -9,4 +9,5 @@ SUBDIRS += \
 #    framework \
 #    glutil \
 #    Tutorial04-colored-cube \
-    Tutorial05-textured-cube
+#    Tutorial05-textured-cube \
+    Tutorial06-keyboard-and-mouse
