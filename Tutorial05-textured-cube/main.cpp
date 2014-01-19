@@ -61,7 +61,8 @@ int main()
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 MVP = projection * view * model;
 
-  GLuint texture = loadDDS("uvtemplate.DDS");
+  GLuint texture = loadTGA_glfw("uvtemplate.tga");
+//  GLuint texture = loadDDS("uvtemplate.DDS");
 
   GLuint texture_id = glGetUniformLocation(programID, "my_texture_sampler");
 
