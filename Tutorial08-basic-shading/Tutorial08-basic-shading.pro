@@ -5,3 +5,7 @@ CONFIG -= qt
 
 SOURCES += main.cpp
 
+OTHER_FILES += \
+    Texture.frag \
+    Transform.vert
+
