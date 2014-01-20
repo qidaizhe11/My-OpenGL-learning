@@ -8,7 +8,8 @@ LIBS += -lGL -lGLU -lGLEW -lglfw
 SOURCES += main.cpp \
     ../common/controls.cpp \
     ../common/shader.cpp \
-    ../common/texture.cpp
+    ../common/texture.cpp \
+    ../common/objloader.cpp
 
 OTHER_FILES += \
     Texture.frag \
@@ -17,5 +18,6 @@ OTHER_FILES += \
 HEADERS += \
     ../common/controls.h \
     ../common/shader.hpp \
-    ../common/texture.h
+    ../common/texture.h \
+    ../common/objloader.h
 

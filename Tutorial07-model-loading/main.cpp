@@ -1,6 +1,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
@@ -10,6 +11,7 @@
 #include "../common/shader.hpp"
 #include "../common/texture.h"
 #include "../common/controls.h"
+#include "../common/objloader.h"
 
 using namespace glm;
 
@@ -58,101 +60,27 @@ int main()
   GLuint programID = LoadShaders("Transform.vert", "Texture.frag");
   GLuint matrixID = glGetUniformLocation(programID, "MVP");
 
-  GLuint texture = loadTGA_glfw("uvtemplate.tga");
-//  GLuint texture = loadDDS("uvtemplate.DDS");
+//  GLuint texture = loadTGA_glfw("uvtemplate.tga");
+  GLuint texture = loadDDS("uvtemplate.DDS");
 
   GLuint texture_id = glGetUniformLocation(programID, "my_texture_sampler");
 
-  static const GLfloat g_vertex_buffer_data[] = {
-      -1.0f,-1.0f,-1.0f,
-      -1.0f,-1.0f, 1.0f,
-      -1.0f, 1.0f, 1.0f,
-       1.0f, 1.0f,-1.0f,
-      -1.0f,-1.0f,-1.0f,
-      -1.0f, 1.0f,-1.0f,
-       1.0f,-1.0f, 1.0f,
-      -1.0f,-1.0f,-1.0f,
-       1.0f,-1.0f,-1.0f,
-       1.0f, 1.0f,-1.0f,
-       1.0f,-1.0f,-1.0f,
-      -1.0f,-1.0f,-1.0f,
-      -1.0f,-1.0f,-1.0f,
-      -1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f,-1.0f,
-       1.0f,-1.0f, 1.0f,
-      -1.0f,-1.0f, 1.0f,
-      -1.0f,-1.0f,-1.0f,
-      -1.0f, 1.0f, 1.0f,
-      -1.0f,-1.0f, 1.0f,
-       1.0f,-1.0f, 1.0f,
-       1.0f, 1.0f, 1.0f,
-       1.0f,-1.0f,-1.0f,
-       1.0f, 1.0f,-1.0f,
-       1.0f,-1.0f,-1.0f,
-       1.0f, 1.0f, 1.0f,
-       1.0f,-1.0f, 1.0f,
-       1.0f, 1.0f, 1.0f,
-       1.0f, 1.0f,-1.0f,
-      -1.0f, 1.0f,-1.0f,
-       1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f,-1.0f,
-      -1.0f, 1.0f, 1.0f,
-       1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f, 1.0f,
-       1.0f,-1.0f, 1.0f
-    };
-
-  // Two UV coordinatesfor each vertex. They were created withe Blender.
-    static const GLfloat g_uv_buffer_data[] = {
-      0.000059f, 1.0f-0.000004f,
-      0.000103f, 1.0f-0.336048f,
-      0.335973f, 1.0f-0.335903f,
-      1.000023f, 1.0f-0.000013f,
-      0.667979f, 1.0f-0.335851f,
-      0.999958f, 1.0f-0.336064f,
-      0.667979f, 1.0f-0.335851f,
-      0.336024f, 1.0f-0.671877f,
-      0.667969f, 1.0f-0.671889f,
-      1.000023f, 1.0f-0.000013f,
-      0.668104f, 1.0f-0.000013f,
-      0.667979f, 1.0f-0.335851f,
-      0.000059f, 1.0f-0.000004f,
-      0.335973f, 1.0f-0.335903f,
-      0.336098f, 1.0f-0.000071f,
-      0.667979f, 1.0f-0.335851f,
-      0.335973f, 1.0f-0.335903f,
-      0.336024f, 1.0f-0.671877f,
-      1.000004f, 1.0f-0.671847f,
-      0.999958f, 1.0f-0.336064f,
-      0.667979f, 1.0f-0.335851f,
-      0.668104f, 1.0f-0.000013f,
-      0.335973f, 1.0f-0.335903f,
-      0.667979f, 1.0f-0.335851f,
-      0.335973f, 1.0f-0.335903f,
-      0.668104f, 1.0f-0.000013f,
-      0.336098f, 1.0f-0.000071f,
-      0.000103f, 1.0f-0.336048f,
-      0.000004f, 1.0f-0.671870f,
-      0.336024f, 1.0f-0.671877f,
-      0.000103f, 1.0f-0.336048f,
-      0.336024f, 1.0f-0.671877f,
-      0.335973f, 1.0f-0.335903f,
-      0.667969f, 1.0f-0.671889f,
-      1.000004f, 1.0f-0.671847f,
-      0.667979f, 1.0f-0.335851f
-    };
+  std::vector<glm::vec3> vertices;
+  std::vector<glm::vec2> uvs;
+  std::vector<glm::vec3> normals;
+  bool res = loadOBJ("cube.obj", vertices, uvs, normals);
 
   GLuint vertexbuffer;
   glGenBuffers(1, &vertexbuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
-               g_vertex_buffer_data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3),
+               &vertices[0], GL_STATIC_DRAW);
 
   GLuint uvbuffer;
   glGenBuffers(1, &uvbuffer);
   glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data),
-               g_uv_buffer_data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2),
+               &uvs[0], GL_STATIC_DRAW);
 
   do {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -179,7 +107,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glDrawArrays(GL_TRIANGLES, 0, 12*3);
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -197,14 +125,3 @@ int main()
   glfwTerminate();
   return 0;
 }
-
-#include <iostream>
-
-using namespace std;
-
-int main()
-{
-  cout << "Hello World!" << endl;
-  return 0;
-}
-
