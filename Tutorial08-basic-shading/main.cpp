@@ -57,18 +57,22 @@ int main()
   glGenVertexArrays(1, &vertex_array_id);
   glBindVertexArray(vertex_array_id);
 
-  GLuint programID = LoadShaders("Transform.vert", "Texture.frag");
-  GLuint matrixID = glGetUniformLocation(programID, "MVP");
+  GLuint programID = LoadShaders("StandardShading.vert",
+                                 "StandardShading.frag");
+
+  GLuint matrix_id = glGetUniformLocation(programID, "MVP");
+  GLuint view_matrix_id = glGetUniformLocation(programID, "V");
+  GLuint model_matrix_id = glGetUniformLocation(programID, "M");
 
 //  GLuint texture = loadTGA_glfw("uvtemplate.tga");
-  GLuint texture = loadDDS("uvtemplate.DDS");
+  GLuint texture = loadDDS("uvmap.DDS");
 
   GLuint texture_id = glGetUniformLocation(programID, "my_texture_sampler");
 
   std::vector<glm::vec3> vertices;
   std::vector<glm::vec2> uvs;
   std::vector<glm::vec3> normals;
-  bool res = loadOBJ("cube.obj", vertices, uvs, normals);
+  bool res = loadOBJ("suzanne.obj", vertices, uvs, normals);
 
   GLuint vertexbuffer;
   glGenBuffers(1, &vertexbuffer);
@@ -82,6 +86,16 @@ int main()
   glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2),
                &uvs[0], GL_STATIC_DRAW);
 
+  GLuint normalbuffer;
+  glGenBuffers(1, &normalbuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+  glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3),
+               &normals[0], GL_STATIC_DRAW);
+
+  glUseProgram(programID);
+  GLuint light_id = glGetUniformLocation(programID,
+                                         "light_position_worldspace");
+
   do {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -93,7 +107,13 @@ int main()
     glm::mat4 model_matrix = glm::mat4(1.0);
     glm::mat4 MVP = projection_matrix * view_matrix * model_matrix;
 
-    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+//    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(view_matrix_id, 1, GL_FALSE, &MVP[0][0]);
+
+    glm::vec3 light_pos = glm::vec3(4, 4, 4);
+    glUniform3f(light_id, light_pos.x, light_pos.y, light_pos.z);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -107,10 +127,15 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 
     glfwSwapBuffers();
   } while (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
@@ -118,6 +143,7 @@ int main()
 
   glDeleteBuffers(1, &vertexbuffer);
   glDeleteBuffers(1, &uvbuffer);
+  glDeleteBuffers(1, &normalbuffer);
   glDeleteProgram(programID);
   glDeleteTextures(1, &texture_id);
   glDeleteVertexArrays(1, &vertex_array_id);
