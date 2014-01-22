@@ -18,18 +18,18 @@ uniform mat4 light_position_worldspace;
 void main() {
   gl_Position = MVP * vec4(vertex_position_modelspace, 1);
 
-  position_worldspace = (M * vec4(vertex_position_modelspace, 1)).xyz;
+  position_worldspace = (M * vec4(vertex_position_modelspace, 1))->xyz;
 
   vec3 vertex_position_cameraspace =
-      (V * M *vec4(vertex_position_modelspace, 1)).xyz;
+      (V * M *vec4(vertex_position_modelspace, 1))->xyz;
   eye_direction_cameraspace = vec3(0, 0, 0) - vertex_position_cameraspace;
 
   vec3 light_position_cameraspace =
-      (V * vec4(light_position_worldspace, 1)).xyz;
+      (V * vec4(light_position_worldspace, 1))->xyz;
   light_direction_camerascace = light_position_cameraspace +
       eye_direction_cameraspace;
 
-  normal_cameraspace = (V * M * vec4(vertex_normal_modelspace, 0)).xyz;
+  normal_cameraspace = (V * M * vec4(vertex_normal_modelspace, 0))->xyz;
 
   uv = vertex_uv;
 

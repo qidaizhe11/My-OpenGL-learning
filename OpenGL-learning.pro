@@ -12,4 +12,5 @@ SUBDIRS += \
 #    Tutorial05-textured-cube \
 #    Tutorial06-keyboard-and-mouse \
 #    Tutorial07-model-loading \
-    Tutorial08-basic-shading
+#    Tutorial08-basic-shading \
+    Tutorial09-vbo-indexing
