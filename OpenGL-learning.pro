@@ -13,4 +13,5 @@ SUBDIRS += \
 #    Tutorial06-keyboard-and-mouse \
 #    Tutorial07-model-loading \
 #    Tutorial08-basic-shading \
-    Tutorial09-vbo-indexing
+#    Tutorial09-vbo-indexing \
+    Tut-01-Hello-Triangle
