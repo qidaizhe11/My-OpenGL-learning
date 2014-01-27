@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    FragPosition.cpp
+    FragPosition.cpp \
+    VertexColors.cpp
 
 
 unix: LIBS += -L$$PWD/../glsdk_0_5_2/glload/lib/ -lglloadD
@@ -16,4 +17,6 @@ unix: PRE_TARGETDEPS += $$PWD/../glsdk_0_5_2/glload/lib/libglloadD.a
 
 OTHER_FILES += \
     FragPosition.frag \
-    FragPosition.vert
+    FragPosition.vert \
+    VertexColors.frag \
+    VertexColors.vert
