@@ -6,7 +6,8 @@ CONFIG -= qt
 SOURCES += \
     cpuPositionOffset.cpp \
     vertPositionOffset.cpp \
-    vertCalcOffset.cpp
+    vertCalcOffset.cpp \
+    fragChangeColor.cpp
 
 
 unix: LIBS += -L$$PWD/../glsdk/glload/lib/ -lglloadD
@@ -20,4 +21,5 @@ OTHER_FILES += \
     data/standard.frag \
     data/standard.vert \
     data/positionOffset.vert \
-    data/calcOffset.vert
+    data/calcOffset.vert \
+    data/calcColor.frag
