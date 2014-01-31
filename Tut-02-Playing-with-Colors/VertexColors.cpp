@@ -6,7 +6,9 @@
 #include <GL/freeglut.h>
 #include "../framework/framework.h"
 
-#define ARRAY_COUNT(array) (sizeof(array) / (sizeof(array[0]) * (sizeof(array) != sizeof(void*) ||  sizeof(array[0]) <= sizeof(void*))))
+//#define ARRAY_COUNT(array) (sizeof(array) / (sizeof(array[0]) * (sizeof(array) != sizeof(void*) ||  sizeof(array[0]) <= sizeof(void*))))
+
+#define ARRAY_COUNT( array ) (sizeof( array ) / (sizeof( array[0] ) * (sizeof( array ) != sizeof(void*) || sizeof( array[0] ) <= sizeof(void*))))
 
 GLuint the_program;
 
