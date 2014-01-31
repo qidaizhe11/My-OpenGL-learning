@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    cpuPositionOffset.cpp
+    cpuPositionOffset.cpp \
+    vertPositionOffset.cpp
 
 
 unix: LIBS += -L$$PWD/../glsdk/glload/lib/ -lglloadD
@@ -16,4 +17,5 @@ unix: PRE_TARGETDEPS += $$PWD/../glsdk/glload/lib/libglloadD.a
 
 OTHER_FILES += \
     data/standard.frag \
-    data/standard.vert
+    data/standard.vert \
+    data/positionOffset.vert
