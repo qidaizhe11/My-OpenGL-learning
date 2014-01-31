@@ -14,10 +14,12 @@ unix: PRE_TARGETDEPS += $$PWD/../glsdk/glload/lib/libglloadD.a
 
 SOURCES += main.cpp \
     OrthoCube.cpp \
-    ShaderPerspective.cpp
+    ShaderPerspective.cpp \
+    MatrixPerspective.cpp
 
 OTHER_FILES += \
     data/OrthoWithOffset.vert \
     data/StandardColors.frag \
-    data/ManualPerspective.vert
+    data/ManualPerspective.vert \
+    data/MatrixPerspective.vert
 
