@@ -8,21 +8,21 @@
 
 #include "../framework/framework.h"
 
-//#define ARRAY_COUNT(array) (sizeof(array) / (sizeof(array[0]) * (sizeof(array) != sizeof(void*) ||  sizeof(array[0]) <= sizeof(void*))))
-
 GLuint the_program;
-GLuint elapsed_time_uniform;
+GLuint offset_location;
 
 void InitializeProgram()
 {
   std::vector<GLuint> shader_list;
 
   shader_list.push_back(Framework::LoadShader(GL_VERTEX_SHADER,
-                                              "standard.vert"));
+                                              "positionOffset.vert"));
   shader_list.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER,
                                               "standard.frag"));
 
   the_program = Framework::CreateProgram(shader_list);
+
+  offset_location = glGetUniformLocation(the_program, "offset");
 }
 
 const float vertex_positions[] = {
@@ -65,31 +65,17 @@ void ComputePositionOffsets(float& x_offset, float& y_offset)
   y_offset = sinf(curr_time_through_loop * scale) * 0.5f;
 }
 
-void AdjustVertexData(float x_offset, float y_offset)
-{
-  std::vector<float> new_data(ARRAY_COUNT(vertex_positions));
-  memcpy(&new_data[0], vertex_positions, sizeof(vertex_positions));
-
-  for(int i = 0; i < ARRAY_COUNT(vertex_positions); i += 4) {
-    new_data[i] += x_offset;
-    new_data[i + 1] += y_offset;
-  }
-
-  glBindBuffer(GL_ARRAY_BUFFER, position_buffer_object);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_positions), &new_data[0]);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void display()
 {
   float x_offset = 0.0f, y_offset = 0.0f;
   ComputePositionOffsets(x_offset, y_offset);
-  AdjustVertexData(x_offset, y_offset);
 
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glUseProgram(the_program);
+
+  glUniform2f(offset_location, x_offset, y_offset);
 
   glBindBuffer(GL_ARRAY_BUFFER, position_buffer_object);
   glEnableVertexAttribArray(0);
