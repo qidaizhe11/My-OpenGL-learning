@@ -14,6 +14,9 @@ GLuint offset_uniform;
 
 GLuint perspective_matrix_uniform;
 
+float perspective_matrix[16];
+const float frustum_scale =1.0f;
+
 void InitializeProgram()
 {
   std::vector<GLuint> shader_list;
@@ -30,28 +33,19 @@ void InitializeProgram()
   perspective_matrix_uniform = glGetUniformLocation(the_program,
                                                     "perspective_matrix");
 
-  float frustum_scale = 1.0f;
   float z_near = 0.5f;
   float z_far = 3.0f;
 
-  float the_matrix[16];
-  memset(the_matrix, 0, sizeof(float) * 16);
+  memset(perspective_matrix, 0, sizeof(float) * 16);
 
-  the_matrix[0] = frustum_scale;
-  the_matrix[5] = frustum_scale;
-  the_matrix[10] = (z_far + z_near) / (z_near - z_far);
-  the_matrix[14] = (2 * z_far * z_near) / (z_near - z_far);
-  the_matrix[11] = -1.0f;
-
-//  frustum_scale_uniform = glGetUniformLocation(the_program, "frustum_scale");
-//  z_near_uniform = glGetUniformLocation(the_program, "z_near");
-//  z_far_uniform = glGetUniformLocation(the_program, "z_far");
+  perspective_matrix[0] = frustum_scale;
+  perspective_matrix[5] = frustum_scale;
+  perspective_matrix[10] = (z_far + z_near) / (z_near - z_far);
+  perspective_matrix[14] = (2 * z_far * z_near) / (z_near - z_far);
+  perspective_matrix[11] = -1.0f;
 
   glUseProgram(the_program);
-//  glUniform1f(frustum_scale_uniform, 1.0f);
-//  glUniform1f(z_near_uniform, 1.0f);
-//  glUniform1f(z_far_uniform, 3.0f);
-  glUniformMatrix4fv(perspective_matrix_uniform, 1, GL_FALSE, the_matrix);
+  glUniformMatrix4fv(perspective_matrix_uniform, 1, GL_FALSE, perspective_matrix);
   glUseProgram(0);
 }
 
@@ -189,7 +183,7 @@ void display()
 
   glUseProgram(the_program);
 
-  glUniform2f(offset_uniform, 0.5f, 0.5f);
+  glUniform2f(offset_uniform, 1.5f, 0.5f);
 
   size_t color_data = sizeof(vertex_data) / 2;
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
@@ -210,6 +204,14 @@ void display()
 
 void reshape(int w, int h)
 {
+  perspective_matrix[0] = frustum_scale / (w / (float)h);
+  perspective_matrix[5] = frustum_scale;
+
+  glUseProgram(the_program);
+  glUniformMatrix4fv(perspective_matrix_uniform, 1, GL_FALSE,
+                     perspective_matrix);
+  glUseProgram(0);
+
   glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
