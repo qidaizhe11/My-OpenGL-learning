@@ -13,9 +13,11 @@ DEPENDPATH += $$PWD/../glsdk/glload/include
 unix: PRE_TARGETDEPS += $$PWD/../glsdk/glload/lib/libglloadD.a
 
 SOURCES += main.cpp \
-    OrthoCube.cpp
+    OrthoCube.cpp \
+    ShaderPerspective.cpp
 
 OTHER_FILES += \
     data/OrthoWithOffset.vert \
-    data/StandardColors.frag
+    data/StandardColors.frag \
+    data/ManualPerspective.vert
 
