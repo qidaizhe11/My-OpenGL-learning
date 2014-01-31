@@ -12,68 +12,81 @@ GLuint the_program;
 
 GLuint offset_uniform;
 
+GLuint frustum_scale_uniform;
+GLuint z_near_uniform, z_far_uniform;
+
 void InitializeProgram()
 {
   std::vector<GLuint> shader_list;
 
   shader_list.push_back(Framework::LoadShader(GL_VERTEX_SHADER,
-                                              "OrthoWithOffset.vert"));
+                                              "ManualPerspective.vert"));
   shader_list.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER,
                                               "StandardColors.frag"));
 
   the_program = Framework::CreateProgram(shader_list);
 
   offset_uniform = glGetUniformLocation(the_program, "offset");
+
+  frustum_scale_uniform = glGetUniformLocation(the_program, "frustum_scale");
+  z_near_uniform = glGetUniformLocation(the_program, "z_near");
+  z_far_uniform = glGetUniformLocation(the_program, "z_far");
+
+  glUseProgram(the_program);
+  glUniform1f(frustum_scale_uniform, 1.0f);
+  glUniform1f(z_near_uniform, 1.0f);
+  glUniform1f(z_far_uniform, 3.0f);
+  glUseProgram(0);
 }
 
 const float vertex_data[] = {
-  0.25f,  0.25f, 0.75f, 1.0f,
-    0.25f, -0.25f, 0.75f, 1.0f,
-   -0.25f,  0.25f, 0.75f, 1.0f,
+  0.25f,  0.25f, -1.25f, 1.0f,
+    0.25f, -0.25f, -1.25f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
 
-    0.25f, -0.25f, 0.75f, 1.0f,
-   -0.25f, -0.25f, 0.75f, 1.0f,
-   -0.25f,  0.25f, 0.75f, 1.0f,
+    0.25f, -0.25f, -1.25f, 1.0f,
+   -0.25f, -0.25f, -1.25f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
 
-    0.25f,  0.25f, -0.75f, 1.0f,
-   -0.25f,  0.25f, -0.75f, 1.0f,
-    0.25f, -0.25f, -0.75f, 1.0f,
+    0.25f,  0.25f, -2.75f, 1.0f,
+   -0.25f,  0.25f, -2.75f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
 
-    0.25f, -0.25f, -0.75f, 1.0f,
-   -0.25f,  0.25f, -0.75f, 1.0f,
-   -0.25f, -0.25f, -0.75f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
+   -0.25f,  0.25f, -2.75f, 1.0f,
+   -0.25f, -0.25f, -2.75f, 1.0f,
 
-   -0.25f,  0.25f,  0.75f, 1.0f,
-   -0.25f, -0.25f,  0.75f, 1.0f,
-   -0.25f, -0.25f, -0.75f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
+   -0.25f, -0.25f, -1.25f, 1.0f,
+   -0.25f, -0.25f, -2.75f, 1.0f,
 
-   -0.25f,  0.25f,  0.75f, 1.0f,
-   -0.25f, -0.25f, -0.75f, 1.0f,
-   -0.25f,  0.25f, -0.75f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
+   -0.25f, -0.25f, -2.75f, 1.0f,
+   -0.25f,  0.25f, -2.75f, 1.0f,
 
-    0.25f,  0.25f,  0.75f, 1.0f,
-    0.25f, -0.25f, -0.75f, 1.0f,
-    0.25f, -0.25f,  0.75f, 1.0f,
+    0.25f,  0.25f, -1.25f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
+    0.25f, -0.25f, -1.25f, 1.0f,
 
-    0.25f,  0.25f,  0.75f, 1.0f,
-    0.25f,  0.25f, -0.75f, 1.0f,
-    0.25f, -0.25f, -0.75f, 1.0f,
+    0.25f,  0.25f, -1.25f, 1.0f,
+    0.25f,  0.25f, -2.75f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
 
-    0.25f,  0.25f, -0.75f, 1.0f,
-    0.25f,  0.25f,  0.75f, 1.0f,
-   -0.25f,  0.25f,  0.75f, 1.0f,
+    0.25f,  0.25f, -2.75f, 1.0f,
+    0.25f,  0.25f, -1.25f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
 
-    0.25f,  0.25f, -0.75f, 1.0f,
-   -0.25f,  0.25f,  0.75f, 1.0f,
-   -0.25f,  0.25f, -0.75f, 1.0f,
+    0.25f,  0.25f, -2.75f, 1.0f,
+   -0.25f,  0.25f, -1.25f, 1.0f,
+   -0.25f,  0.25f, -2.75f, 1.0f,
 
-    0.25f, -0.25f, -0.75f, 1.0f,
-   -0.25f, -0.25f,  0.75f, 1.0f,
-    0.25f, -0.25f,  0.75f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
+   -0.25f, -0.25f, -1.25f, 1.0f,
+    0.25f, -0.25f, -1.25f, 1.0f,
 
-    0.25f, -0.25f, -0.75f, 1.0f,
-   -0.25f, -0.25f, -0.75f, 1.0f,
-   -0.25f, -0.25f,  0.75f, 1.0f,
+    0.25f, -0.25f, -2.75f, 1.0f,
+   -0.25f, -0.25f, -2.75f, 1.0f,
+   -0.25f, -0.25f, -1.25f, 1.0f,
 
 
 
@@ -160,7 +173,7 @@ void display()
 
   glUseProgram(the_program);
 
-  glUniform2f(offset_uniform, 0.5f, 0.25f);
+  glUniform2f(offset_uniform, 0.5f, 0.5f);
 
   size_t color_data = sizeof(vertex_data) / 2;
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
