@@ -12,15 +12,14 @@ GLuint the_program;
 
 GLuint offset_uniform;
 
-GLuint frustum_scale_uniform;
-GLuint z_near_uniform, z_far_uniform;
+GLuint perspective_matrix_uniform;
 
 void InitializeProgram()
 {
   std::vector<GLuint> shader_list;
 
   shader_list.push_back(Framework::LoadShader(GL_VERTEX_SHADER,
-                                              "ManualPerspective.vert"));
+                                              "MatrixPerspective.vert"));
   shader_list.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER,
                                               "StandardColors.frag"));
 
@@ -28,14 +27,31 @@ void InitializeProgram()
 
   offset_uniform = glGetUniformLocation(the_program, "offset");
 
-  frustum_scale_uniform = glGetUniformLocation(the_program, "frustum_scale");
-  z_near_uniform = glGetUniformLocation(the_program, "z_near");
-  z_far_uniform = glGetUniformLocation(the_program, "z_far");
+  perspective_matrix_uniform = glGetUniformLocation(the_program,
+                                                    "perspective_matrix");
+
+  float frustum_scale = 1.0f;
+  float z_near = 0.5f;
+  float z_far = 3.0f;
+
+  float the_matrix[16];
+  memset(the_matrix, 0, sizeof(float) * 16);
+
+  the_matrix[0] = frustum_scale;
+  the_matrix[5] = frustum_scale;
+  the_matrix[10] = (z_far + z_near) / (z_near - z_far);
+  the_matrix[14] = (2 * z_far * z_near) / (z_near - z_far);
+  the_matrix[11] = -1.0f;
+
+//  frustum_scale_uniform = glGetUniformLocation(the_program, "frustum_scale");
+//  z_near_uniform = glGetUniformLocation(the_program, "z_near");
+//  z_far_uniform = glGetUniformLocation(the_program, "z_far");
 
   glUseProgram(the_program);
-  glUniform1f(frustum_scale_uniform, 1.0f);
-  glUniform1f(z_near_uniform, 1.0f);
-  glUniform1f(z_far_uniform, 3.0f);
+//  glUniform1f(frustum_scale_uniform, 1.0f);
+//  glUniform1f(z_near_uniform, 1.0f);
+//  glUniform1f(z_far_uniform, 3.0f);
+  glUniformMatrix4fv(perspective_matrix_uniform, 1, GL_FALSE, the_matrix);
   glUseProgram(0);
 }
 
@@ -210,5 +226,3 @@ unsigned int defaults(unsigned int display_mode, int& width, int& height)
 {
   return display_mode;
 }
-
-
