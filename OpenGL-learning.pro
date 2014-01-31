@@ -16,4 +16,5 @@ SUBDIRS += \
 #    Tutorial09-vbo-indexing \
     Tut-01-Hello-Triangle \
     Tut-02-Playing-with-Colors \
-    Tut-03-Opengls-moving-triangle
+    Tut-03-Opengls-moving-triangle \
+    Tut-04-Objects-at-Rest
