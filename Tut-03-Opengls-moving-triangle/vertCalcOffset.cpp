@@ -9,20 +9,27 @@
 #include "../framework/framework.h"
 
 GLuint the_program;
-GLuint offset_location;
+GLuint elapsed_time_uniform;
 
 void InitializeProgram()
 {
   std::vector<GLuint> shader_list;
 
   shader_list.push_back(Framework::LoadShader(GL_VERTEX_SHADER,
-                                              "positionOffset.vert"));
+                                              "calcOffset.vert"));
   shader_list.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER,
                                               "standard.frag"));
 
   the_program = Framework::CreateProgram(shader_list);
 
-  offset_location = glGetUniformLocation(the_program, "offset");
+  elapsed_time_uniform = glGetUniformLocation(the_program, "time");
+
+  GLuint loop_duration_uniform = glGetUniformLocation(the_program,
+                                                      "loop_duration");
+
+  glUseProgram(the_program);
+  glUniform1f(loop_duration_uniform, 5.0f);
+  glUseProgram(0);
 }
 
 const float vertex_positions[] = {
@@ -53,29 +60,14 @@ void init()
   glBindVertexArray(vao);
 }
 
-void ComputePositionOffsets(float& x_offset, float& y_offset)
-{
-  const float loop_duration = 5.0f;
-  const float scale = 3.14159f * 2.0f / loop_duration;
-
-  float elapsed_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
-  float curr_time_through_loop = fmodf(elapsed_time, loop_duration);
-
-  x_offset = cosf(curr_time_through_loop * scale) * 0.5f;
-  y_offset = sinf(curr_time_through_loop * scale) * 0.5f;
-}
-
 void display()
 {
-  float x_offset = 0.0f, y_offset = 0.0f;
-  ComputePositionOffsets(x_offset, y_offset);
-
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   glUseProgram(the_program);
 
-  glUniform2f(offset_location, x_offset, y_offset);
+  glUniform1f(elapsed_time_uniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
 
   glBindBuffer(GL_ARRAY_BUFFER, position_buffer_object);
   glEnableVertexAttribArray(0);
