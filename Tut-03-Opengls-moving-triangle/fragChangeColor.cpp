@@ -18,7 +18,7 @@ void InitializeProgram()
   shader_list.push_back(Framework::LoadShader(GL_VERTEX_SHADER,
                                               "calcOffset.vert"));
   shader_list.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER,
-                                              "standard.frag"));
+                                              "calcColor.frag"));
 
   the_program = Framework::CreateProgram(shader_list);
 
@@ -26,9 +26,12 @@ void InitializeProgram()
 
   GLuint loop_duration_uniform = glGetUniformLocation(the_program,
                                                       "loop_duration");
+  GLuint frag_loop_duration_uniform = glGetUniformLocation(
+        the_program, "frag_loop_duration");
 
   glUseProgram(the_program);
   glUniform1f(loop_duration_uniform, 5.0f);
+  glUniform1f(frag_loop_duration_uniform, 10.0f);
   glUseProgram(0);
 }
 
@@ -100,5 +103,3 @@ unsigned int defaults(unsigned int display_mode, int& width, int& height)
 {
   return display_mode;
 }
-
-
