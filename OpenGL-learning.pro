@@ -17,4 +17,5 @@ SUBDIRS += \
     Tut-01-Hello-Triangle \
     Tut-02-Playing-with-Colors \
     Tut-03-Opengls-moving-triangle \
-    Tut-04-Objects-at-Rest
+    Tut-04-Objects-at-Rest \
+    Tut-05-Objects-in-Depth
