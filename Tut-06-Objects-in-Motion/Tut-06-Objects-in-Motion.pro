@@ -15,7 +15,7 @@ unix: PRE_TARGETDEPS += $$PWD/../glsdk/glload/lib/libglloadD.a
 SOURCES += main.cpp \
     Translation.cpp \
     Scale.cpp \
-    Rotation.cpp
+    Rotations.cpp
 
 OTHER_FILES += \
     data/PosColorLocalTransform.vert \

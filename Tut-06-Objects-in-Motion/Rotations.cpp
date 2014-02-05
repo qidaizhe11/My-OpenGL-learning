@@ -129,55 +129,92 @@ float CalcLerpFactor(float elapsed_time, float loop_duration)
   return value * 2.0f;
 }
 
-glm::vec3 NullScale(float elapsed_time)
+glm::mat3 NullRotation(float elapsed_time)
 {
-  return glm::vec3(1.0f, 1.0f, 1.0f);
+  return glm::mat3(1.0f);
 }
 
-glm::vec3 StaticUniformScale(float elapsed_time)
+float ComputeAngleRad(float elapsed_time, float loop_duration)
 {
-  return glm::vec3(4.0f, 4.0f, 4.0f);
+  const float scale = 3.14159f * 2.0f / loop_duration;
+  float curr_time_through_loop = fmodf(elapsed_time, loop_duration);
+  return curr_time_through_loop * scale;
 }
 
-glm::vec3 StaticNonUniformScale(float elapsed_time)
+glm::mat3 RotateX(float elapsed_time)
 {
-  return glm::vec3(0.5f, 1.0f, 10.0f);
+  float angle_rad = ComputeAngleRad(elapsed_time, 3.0);
+  float cos = cosf(angle_rad);
+  float sin = sinf(angle_rad);
+
+  glm::mat3 the_mat(1.0f);
+  the_mat[1].y = cos;
+  the_mat[2].y = -sin;
+  the_mat[1].z = sin;
+  the_mat[2].z = cos;
+  return the_mat;
 }
 
-glm::vec3 DynamicUniformScale(float elapsed_time)
+glm::mat3 RotateY(float elapsed_time)
 {
-  const float loop_duration = 3.0f;
+  float angle_rad = ComputeAngleRad(elapsed_time, 2.0f);
+  float cos = cosf(angle_rad);
+  float sin = sinf(angle_rad);
 
-  return glm::vec3(glm::mix(1.0f, 4.0f,
-                            CalcLerpFactor(elapsed_time, loop_duration)));
+  glm::mat3 the_mat(1.0f);
+  the_mat[0].x = cos;
+  the_mat[2].x = sin;
+  the_mat[0].z = -sin;
+  the_mat[2].z = cos;
+  return the_mat;
 }
 
-glm::vec3 DynamicNonUniformScale(float elapsed_time)
+glm::mat3 RotateZ(float elapsed_time)
 {
-  const float x_loop_duration = 3.0f;
-  const float z_loop_duration = 5.0f;
+  float angle_rad = ComputeAngleRad(elapsed_time, 2.0f);
+  float cos = cosf(angle_rad);
+  float sin = sinf(angle_rad);
 
-  return glm::vec3(glm::mix(1.0f, 0.5f,
-                            CalcLerpFactor(elapsed_time, x_loop_duration)),
-                   1.0f,
-                   glm::mix(1.0f, 10.0f,
-                            CalcLerpFactor(elapsed_time, z_loop_duration)));
+  glm::mat3 the_mat(1.0f);
+  the_mat[0].x = cos;
+  the_mat[1].x = -sin;
+  the_mat[0].y = sin;
+  the_mat[1].y = cos;
+  return the_mat;
 }
+
+//glm::mat3 RotateAxis(float elapsed_time)
+//{
+//  float angle_rad = ComputeAngleRad(elapsed_time, 2.0f);
+//  float cos = cosf(angle_rad);
+//  float inv_cos = 1.0f - cos;
+//  float sin = sinf(angle_rad);
+//  float inv_sin = 1.0f - sin;
+
+//  glm::vec3 axis(1.0f, 1.0f, 1.0f);
+//  axis = glm::normalize(axis);
+
+//  glm::mat3 the_mat(1.0f);
+//  the_mat[0].x = (axis.x * axis.x) + ((1 - axis.x * axis.x) * cos);
+//  the_mat[1].x = axis.x * axis.y * inv_cos - (axis.z * sin);
+//  the_mat[2].x = axis.x * axis.z *inv_cos + (axis.y * sin);
+
+//  the_mat[0].y = axis.x * axis.y * inv_cos + axis.z * sin;
+//  the_mat[1].y = (axis.y * axis.y) + ((1 - axis.y * axis.y) * cos);
+//  the_mat[2].y
+//}
 
 struct Instance
 {
-  typedef glm::vec3(*ScaleFunc)(float);
+  typedef glm::mat3(*RotationFunc)(float);
 
-  ScaleFunc CalcScale;
+  RotationFunc CalcRotation;
   glm::vec3 offset;
 
   glm::mat4 ConstructMatrix(float elapsed_time)
   {
-    glm::vec3 the_scale = CalcScale(elapsed_time);
-    glm::mat4 the_mat(1.0f);
-    the_mat[0].x = the_scale.x;
-    the_mat[1].y = the_scale.y;
-    the_mat[2].z = the_scale.z;
+    const glm::mat3& rotation_matrix = CalcRotation(elapsed_time);
+    glm::mat4 the_mat(rotation_matrix);
     the_mat[3] = glm::vec4(offset, 1.0f);
 
     return the_mat;
@@ -185,11 +222,10 @@ struct Instance
 };
 
 Instance g_instance_list[] = {
-  {NullScale,               glm::vec3(0.0f, 0.0f, -45.0f)},
-  {StaticUniformScale,      glm::vec3(-10.0f, -10.0f, -45.0f)},
-  {StaticNonUniformScale,   glm::vec3(-10.0f, 10.0f, -45.0f)},
-  {DynamicUniformScale,     glm::vec3(10.0f, 10.0f, -45.0f)},
-  {DynamicNonUniformScale,  glm::vec3(10.0f, -10.0f, -45.0f)},
+  {NullRotation,    glm::vec3(0.0f, 0.0f, -25.0f)},
+  {RotateX,         glm::vec3(-5.0f, -5.0f, -25.0f)},
+  {RotateY,         glm::vec3(-5.0f, 5.0f, -25.0f)},
+  {RotateZ,         glm::vec3(5.0f, -5.0f, -25.0f)},
 };
 
 void init()
