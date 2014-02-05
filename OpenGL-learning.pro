@@ -19,4 +19,5 @@ SUBDIRS += \
     Tut-03-Opengls-moving-triangle \
     Tut-04-Objects-at-Rest \
     Tut-05-Objects-in-Depth \
-    Tut-06-Objects-in-Motion
+    Tut-06-Objects-in-Motion \
+    Tut-07-World-in-Motion
