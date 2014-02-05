@@ -13,7 +13,8 @@ DEPENDPATH += $$PWD/../glsdk/glload/include
 unix: PRE_TARGETDEPS += $$PWD/../glsdk/glload/lib/libglloadD.a
 
 SOURCES += main.cpp \
-    Translation.cpp
+    Translation.cpp \
+    Scale.cpp
 
 OTHER_FILES += \
     data/PosColorLocalTransform.vert \
