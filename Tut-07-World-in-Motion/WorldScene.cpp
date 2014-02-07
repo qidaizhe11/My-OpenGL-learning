@@ -123,11 +123,9 @@ const float g_parthenon_top_height = 2.0f;
 
 void DrawParthenon(glutil::MatrixStack& model_matrix)
 {
-  {
   // Draw base.
 
-  glutil::PushStack push(model_matrix);
-//  model_matrix.Push();
+  model_matrix.Push();
 
   model_matrix.Scale(glm::vec3(g_parthenon_width, g_parthenon_base_height,
                                g_parthenon_length));
@@ -138,14 +136,13 @@ void DrawParthenon(glutil::MatrixStack& model_matrix)
                      GL_FALSE, glm::value_ptr(model_matrix.Top()));
   glUniform4f(UniformColorTint.base_color_uniform, 0.9f, 0.9f, 0.9f, 0.9f);
   g_cube_tint_mesh->Render();
-  glUseProgram(0);
-  }
 
-  {
+  model_matrix.Pop();
+  glUseProgram(0);
+
   // Draw top.
 
-  glutil::PushStack push(model_matrix);
-//  model_matrix.Push();
+  model_matrix.Push();
 
   model_matrix.Translate(
         glm::vec3(0.0f,
@@ -160,8 +157,9 @@ void DrawParthenon(glutil::MatrixStack& model_matrix)
                      GL_FALSE, glm::value_ptr(model_matrix.Top()));
   glUniform4f(UniformColorTint.base_color_uniform, 0.9f, 0.9f, 0.9f, 0.9f);
   g_cube_tint_mesh->Render();
+
+  model_matrix.Pop();
   glUseProgram(0);
-  }
 }
 
 static glm::vec3 g_camera_target(0.0f, 0.4f, 0.0f);
@@ -211,9 +209,7 @@ void display()
     //
     // Render the ground plane.
     //
-    {
-    glutil::PushStack push(model_matrix);
-//    model_matrix.Push();
+    model_matrix.Push();
 
     model_matrix.Scale(glm::vec3(100.0f, 1.0f, 100.0f));
 
@@ -222,19 +218,18 @@ void display()
                        glm::value_ptr(model_matrix.Top()));
     glUniform4f(UniformColor.base_color_uniform, 0.302f, 0.416f, 0.0589f, 1.0f);
     g_plane_mesh->Render();
+
+    model_matrix.Pop();
     glUseProgram(0);
-    }
 
     //
     // Draw the building.
     //
-    {
-    glutil::PushStack push(model_matrix);
-//    model_matrix.Push();
+    model_matrix.Push();
     model_matrix.Translate(glm::vec3(20.0f, 0.0f, -10.0f));
 
     DrawParthenon(model_matrix);
-    }
+    model_matrix.Pop();
 
   } // end if
 
