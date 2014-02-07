@@ -24,4 +24,6 @@ SOURCES += main.cpp \
 
 OTHER_FILES += \
     data/PosOnlyWorldTransform.vert \
-    data/ColorUniform.frag
+    data/ColorUniform.frag \
+    data/PosColorWorldTransform.vert \
+    data/ColorMultUniform.frag

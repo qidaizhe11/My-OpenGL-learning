@@ -25,6 +25,7 @@ float g_z_near = 1.0f;
 float g_z_far = 1000.0f;
 
 ProgramData UniformColor;
+ProgramData UniformColorTint;
 
 ProgramData LoadProgram(const std::string& str_vertex_shader,
                         const std::string& str_fragment_shader)
@@ -54,6 +55,8 @@ void InitializeProgram()
 {
   UniformColor = LoadProgram("PosOnlyWorldTransform.vert",
                              "ColorUniform.frag");
+  UniformColorTint = LoadProgram("PosColorWorldTransform.vert",
+                                 "ColorMultUniform.frag");
 }
 
 glm::mat4 CalcLookAtMatrix(const glm::vec3& camera_point,
@@ -112,6 +115,55 @@ void init()
   glDepthRange(0.0f, 1.0f);
 }
 
+const float g_parthenon_width = 14.0f;
+const float g_parthenon_length = 20.0f;
+const float g_parthenon_column_height = 5.0f;
+const float g_parthenon_base_height = 1.0f;
+const float g_parthenon_top_height = 2.0f;
+
+void DrawParthenon(glutil::MatrixStack& model_matrix)
+{
+  {
+  // Draw base.
+
+  glutil::PushStack push(model_matrix);
+//  model_matrix.Push();
+
+  model_matrix.Scale(glm::vec3(g_parthenon_width, g_parthenon_base_height,
+                               g_parthenon_length));
+  model_matrix.Translate(glm::vec3(0.0f, 0.5f, 0.0f));
+
+  glUseProgram(UniformColorTint.the_program);
+  glUniformMatrix4fv(UniformColorTint.model_to_world_matrix_uniform, 1,
+                     GL_FALSE, glm::value_ptr(model_matrix.Top()));
+  glUniform4f(UniformColorTint.base_color_uniform, 0.9f, 0.9f, 0.9f, 0.9f);
+  g_cube_tint_mesh->Render();
+  glUseProgram(0);
+  }
+
+  {
+  // Draw top.
+
+  glutil::PushStack push(model_matrix);
+//  model_matrix.Push();
+
+  model_matrix.Translate(
+        glm::vec3(0.0f,
+                  g_parthenon_column_height + g_parthenon_base_height,
+                  0.0f));
+  model_matrix.Scale(glm::vec3(g_parthenon_width, g_parthenon_top_height,
+                               g_parthenon_length));
+  model_matrix.Translate(glm::vec3(0.0f, 0.5f, 0.0f));
+
+  glUseProgram(UniformColorTint.the_program);
+  glUniformMatrix4fv(UniformColorTint.model_to_world_matrix_uniform, 1,
+                     GL_FALSE, glm::value_ptr(model_matrix.Top()));
+  glUniform4f(UniformColorTint.base_color_uniform, 0.9f, 0.9f, 0.9f, 0.9f);
+  g_cube_tint_mesh->Render();
+  glUseProgram(0);
+  }
+}
+
 static glm::vec3 g_camera_target(0.0f, 0.4f, 0.0f);
 
 static glm::vec3 g_sphere_camera_rel_position(67.5f, -46.0f, 150.0f);
@@ -146,31 +198,47 @@ void display()
     camera_matrix.SetMatrix(CalcLookAtMatrix(camera_pos, g_camera_target,
                                              glm::vec3(0.0f, 1.0f, 0.0f)));
 
-  glUseProgram(UniformColor.the_program);
-  glUniformMatrix4fv(UniformColor.world_to_camera_matrix_uniform, 1, GL_FALSE,
-                     glm::value_ptr(camera_matrix.Top()));
-  glUseProgram(0);
+    glUseProgram(UniformColor.the_program);
+    glUniformMatrix4fv(UniformColor.world_to_camera_matrix_uniform, 1, GL_FALSE,
+                       glm::value_ptr(camera_matrix.Top()));
+    glUseProgram(UniformColorTint.the_program);
+    glUniformMatrix4fv(UniformColorTint.world_to_camera_matrix_uniform, 1,
+                       GL_FALSE, glm::value_ptr(camera_matrix.Top()));
+    glUseProgram(0);
 
-  glutil::MatrixStack model_matrix;
+    glutil::MatrixStack model_matrix;
 
-  //
-  // Render the ground plane.
-  //
+    //
+    // Render the ground plane.
+    //
+    {
+    glutil::PushStack push(model_matrix);
+//    model_matrix.Push();
 
-  glutil::PushStack push(model_matrix);
+    model_matrix.Scale(glm::vec3(100.0f, 1.0f, 100.0f));
 
-  model_matrix.Scale(glm::vec3(100.0f, 1.0f, 100.0f));
+    glUseProgram(UniformColor.the_program);
+    glUniformMatrix4fv(UniformColor.model_to_world_matrix_uniform, 1, GL_FALSE,
+                       glm::value_ptr(model_matrix.Top()));
+    glUniform4f(UniformColor.base_color_uniform, 0.302f, 0.416f, 0.0589f, 1.0f);
+    g_plane_mesh->Render();
+    glUseProgram(0);
+    }
 
-  glUseProgram(UniformColor.the_program);
-  glUniformMatrix4fv(UniformColor.model_to_world_matrix_uniform, 1, GL_FALSE,
-                     glm::value_ptr(model_matrix.Top()));
-  glUniform4f(UniformColor.base_color_uniform, 0.302f, 0.416f, 0.0589f, 1.0f);
-  g_plane_mesh->Render();
-  glUseProgram(0);
+    //
+    // Draw the building.
+    //
+    {
+    glutil::PushStack push(model_matrix);
+//    model_matrix.Push();
+    model_matrix.Translate(glm::vec3(20.0f, 0.0f, -10.0f));
 
-  glutSwapBuffers();
+    DrawParthenon(model_matrix);
+    }
 
   } // end if
+
+  glutSwapBuffers();
 }
 
 void reshape(int w, int h)
@@ -181,6 +249,9 @@ void reshape(int w, int h)
   glUseProgram(UniformColor.the_program);
   glUniformMatrix4fv(UniformColor.camera_to_clip_matrix_uniform, 1, GL_FALSE,
                      glm::value_ptr(perspective_matrix.Top()));
+  glUseProgram(UniformColorTint.the_program);
+  glUniformMatrix4fv(UniformColorTint.camera_to_clip_matrix_uniform, 1,
+                     GL_FALSE, glm::value_ptr(perspective_matrix.Top()));
   glUseProgram(0);
 
   glViewport(0, 0, (GLsizei)w, (GLsizei)h);
@@ -193,6 +264,12 @@ void keyboard(unsigned char key, int x, int y)
   case 27:
     delete g_cone_mesh;
     g_cone_mesh = NULL;
+    delete g_cube_tint_mesh;
+    g_cube_tint_mesh = NULL;
+    delete g_cube_color_mesh;
+    g_cube_color_mesh = NULL;
+    delete g_plane_mesh;
+    g_plane_mesh = NULL;
     glutLeaveMainLoop();
     return;
   case 'w': g_camera_target.z -= 4.0f; break;
