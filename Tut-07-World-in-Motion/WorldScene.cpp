@@ -162,6 +162,94 @@ void DrawParthenon(glutil::MatrixStack& model_matrix)
   glUseProgram(0);
 }
 
+void DrawTree(glutil::MatrixStack& model_matrix, float trunk_height = 2.0f,
+              float cone_height = 3.0f)
+{
+  // Draw the trunk
+
+  model_matrix.Push();
+
+  model_matrix.Scale(glm::vec3(1.0f, trunk_height, 1.0f));
+  model_matrix.Translate(glm::vec3(0.0f, 0.5f, 0.0f));
+
+  glUseProgram(UniformColorTint.the_program);
+  glUniformMatrix4fv(UniformColorTint.model_to_world_matrix_uniform, 1,
+                     GL_FALSE, glm::value_ptr(model_matrix.Top()));
+  glUniform4f(UniformColorTint.base_color_uniform, 0.694f, 0.4f, 0.106f, 1.0f);
+  g_cylinder_mesh->Render();
+
+  model_matrix.Pop();
+  glUseProgram(0);
+
+  // Draw the treetop
+
+  model_matrix.Push();
+
+  model_matrix.Translate(glm::vec3(0.0f, trunk_height, 1.0f));
+  model_matrix.Scale(glm::vec3(3.0f, cone_height, 3.0f));
+
+  glUseProgram(UniformColorTint.the_program);
+  glUniformMatrix4fv(UniformColorTint.model_to_world_matrix_uniform, 1,
+                     GL_FALSE, glm::value_ptr(model_matrix.Top()));
+  glUniform4f(UniformColorTint.base_color_uniform, 0.0f, 1.0f, 0.0f, 1.0f);
+  g_cone_mesh->Render();
+
+  model_matrix.Pop();
+  glUseProgram(0);
+}
+
+struct TreeData
+{
+  float x_pos;
+  float z_pos;
+  float trunk_height;
+  float cone_height;
+};
+
+static const TreeData g_forest[] = {
+  { -45.0f, -40.0f, 2.0f, 3.0f },
+  { -42.0f, -35.0f, 2.0f, 3.0f },
+  { -39.0f, -29.0f, 3.0f, 4.0f },
+
+  {-25.0f, -48.0f, 2.0f, 3.0f},
+  {-20.0f, -42.0f, 3.0f, 4.0f},
+  {-22.0f, -39.0f, 2.0f, 3.0f},
+  {-19.0f, -34.0f, 2.0f, 3.0f},
+  {-23.0f, -30.0f, 3.0f, 4.0f},
+  {-24.0f, -24.0f, 2.0f, 3.0f},
+  {-16.0f, -21.0f, 2.0f, 3.0f},
+  {-17.0f, -17.0f, 3.0f, 3.0f},
+  {-25.0f, -13.0f, 2.0f, 4.0f},
+  {-23.0f, -8.0f, 2.0f, 3.0f},
+  {-17.0f, -2.0f, 3.0f, 3.0f},
+  {-16.0f, 1.0f, 2.0f, 3.0f},
+  {-19.0f, 4.0f, 3.0f, 3.0f},
+  {-22.0f, 8.0f, 2.0f, 4.0f},
+  {-21.0f, 14.0f, 2.0f, 3.0f},
+  {-16.0f, 19.0f, 2.0f, 3.0f},
+  {-23.0f, 24.0f, 3.0f, 3.0f},
+  {-18.0f, 28.0f, 2.0f, 4.0f},
+  {-24.0f, 31.0f, 2.0f, 3.0f},
+  {-20.0f, 36.0f, 2.0f, 3.0f},
+  {-22.0f, 41.0f, 3.0f, 3.0f},
+  {-21.0f, 45.0f, 2.0f, 3.0f},
+
+  { 25.0f,  5.0f, 2.0f, 3.0f },
+  { 25.0f, 10.0f, 2.0f, 3.0f },
+};
+
+void DrawForest(glutil::MatrixStack& model_matrix)
+{
+  for (int i = 0; i < ARRAY_COUNT(g_forest); ++i) {
+    const TreeData& curr_tree = g_forest[i];
+
+    model_matrix.Push();
+    model_matrix.Translate(glm::vec3(curr_tree.x_pos, 0.0f, curr_tree.z_pos));
+    DrawTree(model_matrix, curr_tree.trunk_height, curr_tree.cone_height);
+    model_matrix.Pop();
+  }
+}
+
 static glm::vec3 g_camera_target(0.0f, 0.4f, 0.0f);
 
 static glm::vec3 g_sphere_camera_rel_position(67.5f, -46.0f, 150.0f);
@@ -223,6 +311,12 @@ void display()
     glUseProgram(0);
 
     //
+    // Draw the trees
+    //
+
+    DrawForest(model_matrix);
+
+    //
     // Draw the building.
     //
     model_matrix.Push();
@@ -273,7 +367,19 @@ void keyboard(unsigned char key, int x, int y)
   case 'a': g_camera_target.x -= 4.0f; break;
   case 'e': g_camera_target.y -= 4.0f; break;
   case 'q': g_camera_target.y += 4.0f; break;
+  case 'i': g_sphere_camera_rel_position.y -= 11.25f; break;
+  case 'k': g_sphere_camera_rel_position.y += 11.25f; break;
+  case 'j': g_sphere_camera_rel_position.x -= 11.25f; break;
+  case 'l': g_sphere_camera_rel_position.x += 11.25f; break;
+  case 'o': g_sphere_camera_rel_position.z -= 5.0f; break;
+  case 'u': g_sphere_camera_rel_position.z += 5.0f; break;
   }
+
+  g_sphere_camera_rel_position.y = glm::clamp(g_sphere_camera_rel_position.y,
+                                              -78.75f, -1.0f);
+  g_camera_target.y = g_camera_target.y > 0.0f ? g_camera_target.y : 0.0f;
+  g_sphere_camera_rel_position.z = g_sphere_camera_rel_position.z > 5.0f ?
+        g_sphere_camera_rel_position.z : 5.0f;
 
   glutPostRedisplay();
 }
